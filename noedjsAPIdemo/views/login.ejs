@@ -1,0 +1,103 @@
+<!-- views/login.ejs -->
+<!doctype html>
+<html>
+<head>
+	<title>Node Authentication</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+
+	<style>
+		body{ padding-top:80px; }
+        .mh-login-box1{width: 400px!important; height: auto; position: absolute; left: 50%; margin-left: -200px;
+            top:20%;}
+
+        .mh-login-head{background: #337ab7; height: 60px; line-height: 60px; width: 90%; padding: 0 5%; color: #fff; width:100%; }
+        .mh-login-body{background: #efefef; height: auto; padding: 20px 0;}
+        .mh-login-body input{height: 50px; line-height: 50px; width: 90%; margin-left: 5%}
+        .mh-check1{
+            width:20px!important;
+            height: 20px!important;
+            overflow: hidden;
+            float: right;
+        }
+        .mh-login-btn{height: 50px; line-height: 50px; font-size: 16px; width: 90%; margin-left: 5%; background: #337ab7; color: #fff; border: 0; border-radius: 5px; }
+        .mh-login-title{width: 49%; text-align: center; height: 60px; line-height: 60px; float:left; font-size: 16px;}
+        .none{display: none;}
+	</style>
+</head>
+<body>
+<div id="app">
+    <!-- {{1+1}} -->
+
+
+    <div class="mh-login-box1">
+        <div class="mh-login-head" id="tabHead">
+            <span class="mh-login-title" data1="1">登录</span>
+            <b style="display: block;float: left;">|</b>
+            <span class="mh-login-title" data1="2">注册</span>
+        </div>
+        <div class="mh-login-body">
+
+            <form action="/login" method="post" id="login">
+                <div class="form-group" style="padding-top:0px;">
+                    <!--<label>Username</label>-->
+                    <input type="text" class="form-control" name="username" placeholder="用户名">
+                </div>
+                <div class="form-group">
+                    <!--<label>Password</label>-->
+                    <input type="password" class="form-control" name="password" placeholder="密码">
+                </div>
+                 <button type="submit" class="mh-login-btn">登录</button>
+                <div class="form-group" style="padding-top:10px;">
+                    <label style="float:right; padding-right: 5%; margin-top: 5px; padding-left: 5px; display:inline-block">Remember Me</label>
+                    <input type="checkbox" class="form-control mh-check1" name="remember" value="yes">
+                </div>
+            </form>
+            <form action="/login" method="post" id="register" class="none">
+                <div class="form-group" style="padding-top:0px;">
+                    <!--<label>Username</label>-->
+                    <input type="text" class="form-control" name="username" placeholder="设置您的用户名">
+                </div>
+                <div class="form-group">
+                    <!--<label>Password</label>-->
+                    <input type="password" class="form-control" name="password" placeholder="设置您的密码">
+                </div>
+                <button type="submit" class="mh-login-btn">注册</button>
+                <div class="form-group" style="padding-top:10px;">
+                    <label style="float:right; padding-right: 5%; margin-top: 5px; padding-left: 5px; display:inline-block">Remember Me</label>
+                    <input type="checkbox" class="form-control mh-check1" name="remember" value="yes">
+                </div>
+            </form>
+
+        </div>
+        <p style="float: right;height: 40px; line-height: 40px;">Need an account? <a href="/signup">Signup</a></p>
+        <p style="float: right;height: 40px; line-height: 40px;">Or go <a href="/">home</a>.</p>
+   </div>
+
+
+</div>
+<script>
+    var tabHead = document.getElementById("tabHead");
+    var spanArr = tabHead.getElementsByTagName("span");
+    var login = document.getElementById("login");
+    var register =document.getElementById("register");
+    for(var i=0;i<spanArr.length;i++){
+        spanArr[i].onclick=function(){
+           var data1 = this.getAttribute("data1");
+            if(data1 == 2){
+                login.style.display="none";
+                register.style.display="block";
+            }else{
+                login.style.display="block";
+                register.style.display="none";
+            }
+//            alert(data1)
+        }
+    }
+
+
+
+</script>
+
+</body>
+</html>

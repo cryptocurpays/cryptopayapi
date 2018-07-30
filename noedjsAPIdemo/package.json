@@ -1,0 +1,40 @@
+{
+  "name": "node-authentication",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./server"
+  },
+  "dependencies": {
+    "@alicloud/sms-sdk": "^1.1.1",
+    "axios": "^0.18.0",
+    "bchaddrjs": "^0.2.1",
+    "bcrypt-nodejs": "0.0.3",
+    "big-integer": "^1.6.27",
+    "body-parser": "^1.13.1",
+    "connect-flash": "^0.1.1",
+    "connect-redis": "^3.3.3",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.3.2",
+    "express": "^4.13.0",
+    "express-session": "^1.11.3",
+    "express-ws": "^3.0.0",
+    "forever": "^0.15.3",
+    "hooked-web3-provider": "^1.0.0",
+    "morgan": "^1.6.0",
+    "mysql": "^2.7.0",
+    "npm-address-translator": "^1.0.4",
+    "passport": "^0.2.2",
+    "passport-local": "^1.0.0",
+    "qr-image": "^3.2.0",
+    "qrcode": "^1.2.0",
+    "redis": "^2.8.0",
+    "vue": "^2.5.16",
+    "vue-cli": "^2.9.6",
+    "web3": "^0.16.0",
+    "websocket": "^1.0.25"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/JeremywangCN/cyptocenter.git"
+  }
+}
