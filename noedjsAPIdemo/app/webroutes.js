@@ -1,7 +1,9 @@
 // app/routes.js
 
+const RouletteController = require('./../roulette/roundController');
 
 var loginpath = require("./../path/loginPath");
+var profile = require("./../path/profilePath");
 var details = require("./../path/detailsPath")
 
 
@@ -37,6 +39,7 @@ module.exports = {initRoutes: function(app, passport,worker) {
 
     app.get('/login', loginpath.loginGet);
 
+
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
             successRedirect : '/userdata', // redirect to the secure profile section
@@ -52,22 +55,63 @@ module.exports = {initRoutes: function(app, passport,worker) {
                 req.session.cookie.expires = false;
             }
             res.redirect('/');
-        });
+        }
+    );
+
+
+    app.get('/signup', function (req,res,next) {
+
+        res.render('signup.ejs', { message: req.flash('signupMessage') });
+
+    });
+
+    app.post('/signup', function(req, res, next) {
+        passport.authenticate('local-signup',function(err, user, info){
+            //注册失败
+            if(!user){
+                console.log(req.body.username+" 玩家注册失败")
+                return res.send(info)
+            }
+            //注册成功
+            //var user = req.user
+            console.log(user)
+            if (req.body.remember) {
+                req.session.cookie.maxAge = 1000 * 60 * 3;
+            } else {
+                req.session.cookie.expires = false;
+            }
+            res.send(user)
+
+
+        })(req, res, next);
+    })
 
 
 
     app.get('/details',isLoggedIn, details.detailsGet);//test
 
-    app.get('/useraddress',details.useraddress)  //后台向 api 请求参数
-    app.get('/getrates',details.getrates)   //后台向 api 请求参数
-    app.get('/pendingdeposits',details.pendingDeposits)  //后台向 api 请求参数
-    app.get('/withdraw',details.withdraw)   //后台向 api 请求参数
-    app.get('/withdrawlist',details.withdrawList)   //后台向 api 请求参数
-    app.get('/depositlist',details.depositList) //后台向 api 请求参数
+
+    app.ws('/echo',function (ws,req) {
+
+
+        RouletteController.clientReqController(ws,req,worker);
+    });
+
+
+    //background web
+
+
+    app.get('/useraddress',details.useraddress)
+    app.get('/getrates',details.getrates)
+    app.get('/pendingdeposits',details.pendingDeposits)
+    app.get('/outwithdraw',details.withdraw)
+    app.get('/withdrawlist',details.withdrawList)
+    app.get('/depositlist',details.depositList)
+    app.get('/openotcurl',details.openotcurl)
 
     //restful 通知
-    app.post('/deposit',details.postNewDeposit) //deposit   等待接受通知
-    app.post('/withdraw',details.postWithdraw) //withdraw   等待接受通知
+    app.post('/deposit',details.postNewDeposit) //deposit
+    app.post('/withdraw',details.postWithdraw) //deposit
 
 
 }};

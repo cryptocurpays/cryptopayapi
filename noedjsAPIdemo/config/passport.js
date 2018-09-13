@@ -3,6 +3,8 @@
 // load all the things we need
 var LocalStrategy   = require('passport-local').Strategy;
 
+var keystore = require('./../service/keystoreeth');
+var bchKeyUtils = require("./../service/keystorebch");
 
 // load up the user model
 const DBSERVICE = require('./../service/db_service');
@@ -163,8 +165,8 @@ module.exports = function(passport) {
                 var newUserMysql = {
                     username: this.bodys.username,
                     password: bcrypt.hashSync(this.bodys.password, null, null) , // use the generateHash function in our user model
-                    accounttype: bodys.accounttype,
-                    imei:bodys.imei,
+                    accounttype: 10,
+                    imei:'aksjnquw',
                     nickname:"欢迎",
                     invitationcode:'123456'
 

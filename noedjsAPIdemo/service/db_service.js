@@ -1,5 +1,7 @@
 const MYSQL = require('mysql');
 const DBCONFIG = require('./../config/database');
+//const connection = MYSQL.createConnection(DBCONFIG.connection);
+const ETHCONFIG = require('./../config/ethereum');
 var bcrypt = require('bcrypt-nodejs');
 var pool= MYSQL.createPool(DBCONFIG.connection);
 
@@ -151,7 +153,7 @@ function updateWithdrawByOrderId(orderid,data,done) {
         }
 
         var sql = "UPDATE " + DBCONFIG.database + "."+DBCONFIG.app_withdraw_table+" SET txid = "+codeSQLescape(data.txid) +" , blocknumber="+codeSQLescape(data.blocknumber)+ " , statues="+codeSQLescape(data.statues)+" WHERE orderid = '"+orderid +"'"
-
+        console.log(sql)
         connection.query(sql, function (err, rows) {
             if (err) {
                 return done(err);
@@ -243,6 +245,26 @@ function addUser(newUserMysql, done) {
 }
 
 
+function getAllTableConfig(done) {
+    pool.getConnection(function (err,connection) {
+        if (err) {
+            connection.release();
+            return done("Error in connection database");
+        }
+
+        var sql = "SELECT * from " + DBCONFIG.database + "."+DBCONFIG.tableconfig_table+" WHERE visable =0 ORDER BY rank"
+
+        connection.query(sql, function (err, rows) {
+            if (err) {
+                return done(err);
+            }
+            return done(null, rows);
+        });
+        connection.release();
+    })
+}
+
+
 function updateAddGamesByPlayerid(playerid,done) {
     pool.getConnection(function (err,connection) {
         if (err) {
@@ -280,6 +302,69 @@ function updateAMaxWinCoinByPlayerid(maxwincoin,playerid,done) {
         connection.release();
     })
 }
+
+function addPlayerWinLog(blocknumber, playerid,tableid,indexnumber,wincoin,bettingcoin,createtime,done) {
+    pool.getConnection(function (err,connection) {
+        if (err) {
+            connection.release();
+            return done("Error in connection database");
+        }
+
+        var sql = "INSERT INTO "+DBCONFIG.database + "." +DBCONFIG.playerwin_table+" ( blocknumber, playerid,tableid,indexnumber,wincoin,bettingcoin,createtime) values ("+
+            blocknumber+", "+playerid+",'"+tableid+"',"+indexnumber+","+wincoin+","+bettingcoin+","+createtime+")";
+        console.log(sql)
+        connection.query(sql, function (err, rows) {
+            if (err) {
+                return done(err);
+            }
+            return done(null, rows);
+        });
+        connection.release();
+    })
+}
+
+function addPlayerActionLog(blocknumber, playerid,tableid,createtime,winlist,loselist,done) {
+    pool.getConnection(function (err,connection) {
+        if (err) {
+            connection.release();
+            return done("Error in connection database");
+        }
+
+        var sql = "INSERT INTO "+DBCONFIG.database + "." +DBCONFIG.playgameactionlog_table+" ( blocknumber, playerid,tableid,actionid,bettype,betnumber,betcoin,indexaction,createtime) values "
+
+
+        if(winlist.length>0){
+            for(var i = 0 ; i < winlist.length ; i ++){
+                var b = winlist[i]
+                sql = sql+"("+blocknumber+","+playerid+",'"+tableid+"',"+tools.PlayActionCode.WinBet+",'"+b.type+"','"+b.value+"',"+b.amount+","+i+","+createtime  +")"
+                if(i<winlist.length-1){
+                    sql = sql+","
+                }
+            }
+        }
+
+        if(loselist.length>0){
+            sql = sql+","
+            for(var i = 0 ; i < loselist.length ; i ++){
+                var b = loselist[i]
+                sql = sql+"("+blocknumber+","+playerid+",'"+tableid+"',"+tools.PlayActionCode.LoseBet+",'"+b.type+"','"+b.value+"',"+b.amount+","+i+","+createtime  +")"
+                if(i<loselist.length-1){
+                    sql = sql+","
+                }
+            }
+        }
+
+        console.log(sql)
+        connection.query(sql, function (err, rows) {
+            if (err) {
+                return done(err);
+            }
+            return done(null, rows);
+        });
+        connection.release();
+    })
+}
+
 
 
 function addARecord(tableName, fieldList, done) {
@@ -337,12 +422,15 @@ module.exports = {
     getPlayerByUserid:getPlayerByUserid,
     addUser:addUser,
     updateCoinByUsername:updateCoinByUsername,
+    getAllTableConfig:getAllTableConfig,
     getPlayerByplayerid:getPlayerByplayerid,
     updateDeCoinByUsername:updateDeCoinByUsername,
     updateAddCoinByUsername:updateAddCoinByUsername,
     updateAddCoinByPlayerid:updateAddCoinByPlayerid,
     updateAddGamesByPlayerid:updateAddGamesByPlayerid,
     updateAMaxWinCoinByPlayerid:updateAMaxWinCoinByPlayerid,
+    addPlayerWinLog:addPlayerWinLog,
+    addPlayerActionLog:addPlayerActionLog,
     getDepositByTxid:getDepositByTxid,
     addARecord:addARecord,
     getWithdrawByTxid:getWithdrawByTxid,

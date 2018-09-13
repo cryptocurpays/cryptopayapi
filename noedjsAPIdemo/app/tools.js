@@ -4,6 +4,33 @@
 
 var request = require('request');
 
+var emailconfig = require('./../config/emailconfig')
+var nodemailer = require('nodemailer')
+var smtpTransport = require('nodemailer-smtp-transport');
+smtpTransport = nodemailer.createTransport(smtpTransport({
+    service: emailconfig.email.service,
+    auth: {
+        user: emailconfig.email.user,
+        pass: emailconfig.email.pass
+    }
+}));
+
+
+
+const SMSClient = require('@alicloud/sms-sdk')
+const accessKeyId = emailconfig.aliyunohone.accessKeyId
+const secretAccessKey = emailconfig.aliyunohone.secretAccessKey
+//初始化sms_client
+let smsClient = new SMSClient({accessKeyId,secretAccessKey})
+
+const SIGNING_v1 ='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'//36
+const SIGNING_v2 ='ABCDEFGHJKMNPQRSTUVWXYZ23456789'//31
+const SIGNING_v3 ='1234567890'//10
+const SIGNING_v4 ='ABCDEFGHIJKLMNOPQRSTUVWXYZ'//26
+
+
+const REDIS_KEY_VC='VC'//redis  存贮验证码   VC_USERNAME_TYPE
+const VC_TTL_TIME=60*10
 
 
 const CryptoType = {
@@ -19,6 +46,32 @@ const ERRORCODE={
 }
 
 
+
+const roundStatus ={
+    NEW: 0,// 新创建的块
+    CLOSE: 2,//关闭投注
+    RESULT: 4,//已经生成结果
+    //WAITINGNEXT:5,//一轮结束 等待下一轮
+    CLEAR:6//清空,暂时没用
+};
+
+const betErrCode={
+    Success:0,
+    NoEnoughCoins:1,
+    BetDataIllegal:2,
+    RoundIsClosed:3,
+    RoundIsExpired:4,
+
+    TableIdError:5,
+
+    RevokeNoHavePlayer:6,
+    RevokeNoBet:7,//没有bet可以撤销了
+
+    TopPlayerRoundError:8,
+    TopPlayerNoP:9,//前10 没有这个人
+};
+
+
 const MessageCode={
     SIGNUP:1,
 
@@ -29,6 +82,11 @@ const PlayActionCode={
     Bet:10,
     Revoker:20,
 
+
+
+
+    WinBet:500,//牌局记录用
+    LoseBet:510,//牌局记录用
 }
 
 
@@ -67,6 +125,68 @@ function sendhttpget(url,done){
     })
 }
 
+
+function GetRandomNum(Min,Max)
+{
+    var Range = Max - Min;
+    var Rand = Math.random();
+    return(Min + Math.round(Rand * Range));
+}
+
+
+
+
+
+function sendCodeToUser(account,type,body){
+    switch (parseInt(type)){
+        case PLAYERACCOUNTTYPE.PHONE:
+            sendPhoneMessage(account,"测试",body)
+            break;
+        case PLAYERACCOUNTTYPE.EMAIL:
+            sendMail(account,"测试",body)
+            break;
+    }
+}
+
+
+function sendMail(recipient, subject, html) {
+
+    smtpTransport.sendMail({
+
+        from: emailconfig.email.user,
+        to: recipient,
+        subject: subject,
+        html: html
+
+    }, function (error, response) {
+        if (error) {
+            console.log(error);
+        }
+        console.log('发送成功')
+    });
+}
+
+
+//发送短信
+function sendPhoneMessage(recipient, subject, html) {
+
+    smsClient.sendSMS({
+        PhoneNumbers: recipient,
+        SignName: '阿里云短信测试专用',
+        TemplateCode: 'SMS_137570053',
+        TemplateParam: '{"code":"'+html+'"}'
+    }).then(function (res) {
+        let {Code}=res
+        if (Code === 'OK') {
+            //处理返回参数
+            console.log(res)
+        }
+    }, function (err) {
+        console.log(err)
+    })
+}
+
+
 function isNullStringLength(str,min,max){
     if(isNullString(str) || str.length < min || str.length > max)
         return true
@@ -102,6 +222,16 @@ module.exports={
     CryptoType,
     ERRORCODE,
     PLAYERACCOUNTTYPE,
+    roundStatus,
+    betErrCode,
+    GetRandomNum,
+    SIGNING_v1,
+    SIGNING_v2,
+    SIGNING_v3,
+    SIGNING_v4,
+    REDIS_KEY_VC,
+    VC_TTL_TIME,
+    sendCodeToUser,
     MessageCode,
     PlayActionCode,
     isNullStringLength,
