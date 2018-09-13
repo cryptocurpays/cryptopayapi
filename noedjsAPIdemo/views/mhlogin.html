@@ -72,6 +72,11 @@
             height: 200px!important;
             line-height: 200px!important;
         }
+        .clickotc{
+            height: 40px!important;
+            line-height: 60px!important;
+        }
+
         .btn1{
             background: #66b1ff;
             border: 0;
@@ -124,6 +129,18 @@
         </table>
 
     </div>
+
+    <div class="body-box">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">购币充值</h3>
+            </div>
+
+            <a  id="clickotcid" class="clickotc" >点击跳转购币充值界面</a>
+        </div>
+    </div>
+
+
 
     <div class="body-box">
         <div class="panel panel-primary">
@@ -356,6 +373,17 @@
             _this.list5 = result.body;
             console.log(result.body);
         })
+
+        this.$http.get('/openotcurl').then(function(result) {
+            // _this.list5 = result.body;
+
+            var box = document.getElementById('clickotcid');
+            box.href=result.body
+            console.log(box);
+        })
+
+
+
     },
     methods: {
         toShow(id, key) {
@@ -373,7 +401,7 @@
         insertData() {
             var _this = this;
             var url = "";
-            url = "/withdraw?toaddress=" + this.toaddress + "&cryptoType=" + this.cryptoType + "&amount=" + this.amount;
+            url = "/outwithdraw?toaddress=" + this.toaddress + "&cryptoType=" + this.cryptoType + "&amount=" + this.amount;
             this.$http.get(url).then(function(result) {
                 _this.list = result.body;
                 console.log(_this.list)
@@ -389,6 +417,9 @@
         },
     }
     });
+
+
+
 </script>
 
 </body>

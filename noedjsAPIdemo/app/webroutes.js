@@ -1,9 +1,7 @@
 // app/routes.js
 
-const RouletteController = require('./../roulette/roundController');
 
 var loginpath = require("./../path/loginPath");
-var profile = require("./../path/profilePath");
 var details = require("./../path/detailsPath")
 
 
@@ -90,12 +88,6 @@ module.exports = {initRoutes: function(app, passport,worker) {
 
     app.get('/details',isLoggedIn, details.detailsGet);//test
 
-
-    app.ws('/echo',function (ws,req) {
-
-
-        RouletteController.clientReqController(ws,req,worker);
-    });
 
 
     //background web

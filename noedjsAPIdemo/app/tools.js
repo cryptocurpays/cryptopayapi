@@ -4,24 +4,7 @@
 
 var request = require('request');
 
-var emailconfig = require('./../config/emailconfig')
-var nodemailer = require('nodemailer')
-var smtpTransport = require('nodemailer-smtp-transport');
-smtpTransport = nodemailer.createTransport(smtpTransport({
-    service: emailconfig.email.service,
-    auth: {
-        user: emailconfig.email.user,
-        pass: emailconfig.email.pass
-    }
-}));
 
-
-
-const SMSClient = require('@alicloud/sms-sdk')
-const accessKeyId = emailconfig.aliyunohone.accessKeyId
-const secretAccessKey = emailconfig.aliyunohone.secretAccessKey
-//初始化sms_client
-let smsClient = new SMSClient({accessKeyId,secretAccessKey})
 
 const SIGNING_v1 ='ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'//36
 const SIGNING_v2 ='ABCDEFGHJKMNPQRSTUVWXYZ23456789'//31

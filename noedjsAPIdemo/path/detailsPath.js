@@ -11,10 +11,16 @@ const DBService =require('./../service/db_service');
 
 var apihost='https://api.cryptocurpays.com:8080/api/v1/'
 
-var appId=152
+var appId=153
 var userId = 11872
-var appSecret = 'd3BnNyOvv1PrhbtluYe3WnG9ukvCNIcHLLMqw8XqrUqxHx5lc6gqSUCpxxE06C4GVAdNbR0OQgr2WprGUxyd8Iluhm9G77tLD5ndx04M7pdy2kdKImcm7vOEzkLxtKW09f8TOCZVd4cGXwXhLrMwkHe2tbaJNNrZQWtEoperxNc1XOfv6qdeFrmGEuf5s8Cf1l1HdrAS'
+var appSecret = 'lRxHaZ0fdXaiiTJCgCp4H5HlN2Fom9OdPEEl5grtYf5PZs0lVGOF0ZyuXEaT7adRLqzsCegpw2YqPeEiv8EDbxTLGPQrkWPOHyOGHHMExscZ2oayEOXhNp1a9KADlyZhZRUeig08OYSEKWHHlmFXca1IELbI9MRnxTyS1wcMJLV3c8GOQn9W3PmgQQUBCr0QfnqYcWqI'
+var token = '9o3YxnWu0uVU59xeY3kPsNM2LL10mltRwNAM-UmM'
 
+//var data = {
+//    appId:appId,
+//    userId:userId,
+//    appsecret:appSecret,
+//}
 
 function detailsGet(req,res){
     var data ={}
@@ -23,6 +29,7 @@ function detailsGet(req,res){
 
         this.res.render('profile.ejs', {user: user});
     }.bind({res:this.res}))
+
 
 }
 
@@ -89,7 +96,8 @@ function withdraw(req,res){
             withdrawId:d.valueOf(),
             appSecret:appSecret,
             cryptoValue:req.query.amount,
-            appuserid:req.user.playerid
+            appuserid:req.user.playerid,
+            signature:"123123"
         }
 
         let postObj = {};
@@ -186,10 +194,7 @@ function postNewDeposit(req,res){
         postObj.cryptoValue = body.cryptoValue;
         postObj.fiatCurrency = body.fiatCurrency;
         postObj.fiatRate = body.fiatRate;
-
-        var virtualValue=1;//服务内和法币的汇率
-
-        postObj.virtualValue = virtualValue*body.fiatRate*body.cryptoValue//根据法币和加密币的汇率,和加密币的数据,  算出 应该给玩家的真正数值
+        postObj.virtualValue = body.fiatRate*body.cryptoValue//body.virtualValue;
         postObj.createtime = body.timestamp;
         postObj.fromAddress = body.fromAddress;
         postObj.toAddress = body.toAddress;
@@ -219,7 +224,7 @@ function postNewDeposit(req,res){
 
 function postWithdraw(req,res){
     var body = req.body
-    //console.log(body)
+    console.log(body)
     if(tools.isNullString(body)){
         return res.send("body fail")
     }
@@ -252,8 +257,6 @@ function postWithdraw(req,res){
         })
 
 
-
-
     }.bind({body}))
 
 
@@ -263,5 +266,26 @@ function postWithdraw(req,res){
 }
 
 
-module.exports={detailsGet,useraddress,getrates,pendingDeposits,withdraw,postNewDeposit,postWithdraw,withdrawList,depositList}
+function openotcurl(req,res){
+    //return res.send('{"eth":{"0x50753cdefd9d1cfb1ab004289b987ec01ef78c88136a0d98635693e911e835f4":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":19,"need":20},"0xc5d95ca4e1fe3de8c63e37c5a81857fa5919c7abf09ad70b14261929fbca0bfa":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20},"0xff9be4fb9b65e672b4e22d66ca8c3f1865da1dd5febb85611981249e13eebbbc":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20}}}')
+
+
+    getUserApiToken(req.user.playerid,function(tonken){
+        var url = apihost+appId+"/otcurl/"+req.user.playerid+"?token="+tonken
+        //console.log(url)
+        tools.sendhttpget(url,function(err,data){
+            console.log(err)
+            console.log(data)
+            data = JSON.parse(data)
+            res.send(data.data)
+        })
+    })
+
+
+}
+
+
+module.exports={detailsGet,useraddress,getrates,pendingDeposits,withdraw,postNewDeposit,postWithdraw,withdrawList,depositList
+    ,openotcurl,
+}
 

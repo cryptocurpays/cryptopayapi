@@ -1,8 +1,6 @@
 const MYSQL = require('mysql');
 const DBCONFIG = require('./../config/database');
 //const connection = MYSQL.createConnection(DBCONFIG.connection);
-const ETHCONFIG = require('./../config/ethereum');
-var bcrypt = require('bcrypt-nodejs');
 var pool= MYSQL.createPool(DBCONFIG.connection);
 
 var tools=require("./../app/tools")
