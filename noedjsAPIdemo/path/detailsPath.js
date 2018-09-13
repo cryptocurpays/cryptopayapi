@@ -9,7 +9,7 @@ const redisconfig = require('./../config/redisconfig')
 client = redis.createClient(redisconfig.port,redisconfig.host);
 const DBService =require('./../service/db_service');
 
-var apihost='https://api.cryptocurpays.com:8080/api/v1/'
+var apihost='https://api.cryptocurpays.com/api/v1/'
 
 var appId=153
 var userId = 11872
