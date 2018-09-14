@@ -9,7 +9,7 @@ const redisconfig = require('./../config/redisconfig')
 client = redis.createClient(redisconfig.port,redisconfig.host);
 const DBService =require('./../service/db_service');
 
-var apihost='https://api.cryptocurpays.com/api/v1/'
+var apihost='https://api.cryptocurpays.com:8080/api/v1/'
 
 var appId=153
 var userId = 11872
@@ -108,21 +108,49 @@ function withdraw(req,res){
         postObj.playerid = data.appuserid
 
 
-
-        DBService.addARecord("app_withdraw",postObj,function(err,d){
-
+        var url = apihost+"rates/cny"
+        //console.log(url)
+        tools.sendhttpget(url, function (err, data) {
             console.log(err)
-            console.log(d)
+            console.log(data)
+            data = JSON.parse(data)
+            // res.send(data.data)
 
-            var url = apihost+appId+"/tx/withdraw/"+req.query.cryptoType
-            //console.log(url)
-            tools.sendhttppost(url,this.data,function(err,data){
+
+            var rates = data.data[postObj.cryptotype]
+
+            var coin = postObj.cryptovalue*rates
+
+            DBService.updateAddCoinByPlayerid(-coin,req.user.playerid,function(err,data){
+
                 console.log(err)
-                console.log(data)
-                data = JSON.parse(data)
-                res.send(data)
-            })
-        }.bind({postObj,data}))
+                //console.log(data)
+
+                // res.send("success")
+
+
+                DBService.addARecord("app_withdraw",postObj,function(err,d){
+
+                    console.log(err)
+                    console.log(d)
+
+                    var url = apihost+appId+"/tx/withdraw/"+req.query.cryptoType
+                    console.log(url)
+                    tools.sendhttppost(url,this.data,function(err,data){
+                        console.log(err)
+                        console.log(data)
+                        data = JSON.parse(data)
+                        res.send(data)
+                    })
+                }.bind({postObj,data}))
+
+
+
+            }.bind({postObj}))
+
+
+        })
+
 
 
 
