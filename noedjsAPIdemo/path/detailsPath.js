@@ -197,21 +197,21 @@ function postNewDeposit(req,res){
     var body = req.body
     //console.log(body)
     if(tools.isNullString(body)){
-        return res.send("body fail")
+        return res.send("{\"message\":\"err!\"}")
     }
 
     if(tools.isNullString(body.txId)){
-        return res.send("txId fail")
+        return res.send("{\"message\":\"err!\"}")
     }
 
     DBService.getDepositByTxid(body.txId,function(err,data){
         if(err){
             console.log(err)
-            return res.send("txId fail")
+            return res.send("{\"message\":\"err!\"}")
         }
 
         if(data.length>0){
-            return res.send("have data")
+            return res.send("{\"message\":\"received!\"}")
         }
 
         let postObj = {};
@@ -238,7 +238,7 @@ function postNewDeposit(req,res){
                 console.log(err)
                 //console.log(data)
 
-                res.send("{\"message\":\"received!\"}")
+                return res.send("{\"message\":\"received!\"}")
             }.bind({postObj}))
 
 
