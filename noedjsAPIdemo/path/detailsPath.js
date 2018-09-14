@@ -299,7 +299,7 @@ function openotcurl(req,res){
 
 
     getUserApiToken(req.user.playerid,function(tonken){
-        var url = apihost+appId+"/otcurl/"+req.user.playerid+"?token="+tonken
+        var url = apihost+appId+"/otcurl/"+req.user.playerid+"?token="+tonken+"&userName="+req.user.nickname
         //console.log(url)
         tools.sendhttpget(url,function(err,data){
             console.log(err)
