@@ -230,7 +230,7 @@ function postNewDeposit(req,res){
         DBService.addARecord("app_deposits",postObj,function(err,data){
             if(err){
                 console.log(err)
-                return res.send("error")
+                return res.send("{\"message\":\"err!\"}")
             }
 
             DBService.updateAddCoinByPlayerid(this.postObj.virtualValue,this.postObj.playerid,function(err,data){
@@ -238,7 +238,7 @@ function postNewDeposit(req,res){
                 console.log(err)
                 //console.log(data)
 
-                res.send("success")
+                res.send("{\"message\":\"received!\"}")
             }.bind({postObj}))
 
 
@@ -254,11 +254,11 @@ function postWithdraw(req,res){
     var body = req.body
     console.log(body)
     if(tools.isNullString(body)){
-        return res.send("body fail")
+        return res.send("{\"message\":\"body fail!\"}")
     }
 
     if(tools.isNullString(body.orderid)){
-        return res.send("txId fail")
+        return res.send("{\"message\":\"txId fail!\"}")
     }
 
     DBService.getWithdrawByTxid(body.orderid,function(err,data){
@@ -269,7 +269,7 @@ function postWithdraw(req,res){
         }
 
         if(data[0].statues==10){
-            return res.send("success")
+            return res.send("{\"message\":\"received!\"}")
         }
 
         var tx = {}
@@ -281,7 +281,7 @@ function postWithdraw(req,res){
             console.log(err)
             console.log(data)
 
-            return res.send("success")
+            return res.send("{\"message\":\"received!\"}")
         })
 
 
