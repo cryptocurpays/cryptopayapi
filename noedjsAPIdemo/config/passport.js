@@ -33,13 +33,13 @@ module.exports = function(passport) {
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
         //console.log('user'+user)
-        done(null, user.playerid);
+        done(null, user.username);
     });
 
     // used to deserialize the user
-    passport.deserializeUser(function(id, done) {
+    passport.deserializeUser(function(username, done) {
 
-        DBSERVICE.getPlayerByplayerid(id,function (err,rows) {
+        DBSERVICE.getPlayerByUserName(username,function (err,rows) {
             //console.log(err)
             if(err)
                 return
@@ -72,26 +72,8 @@ module.exports = function(passport) {
             // we are checking to see if the user trying to login already exists
 
             var bodys = req.body;
-            //console.log(bodys)
 
-            if(bodys.accounttype != tools.PLAYERACCOUNTTYPE.VISITOR){
-                var redie_key=tools.REDIS_KEY_VC+"_"+bodys.username+"_"+parseInt(tools.MessageCode.SIGNUP)
-                console.log(redie_key)
-
-                client.get(redie_key,function(err,currentRN){
-                    //console.log(this.bodys)
-                    console.log("currentRN = "  +currentRN)
-
-                    if(currentRN != bodys.vccode){
-                        return done(null, false,{type:tools.ERRORCODE.VCCODE,message:"验证码错误"}); // create the loginMessage and save it to session as flashdata
-                    }
-                    usersignup(this.bodys,done)
-
-
-                }.bind({bodys:bodys}))
-            }else{
-                usersignup(bodys,done)
-            }
+            userSignUp(bodys,done)
 
         })
     );
@@ -115,18 +97,18 @@ module.exports = function(passport) {
                 passwordField : 'password',
                 passReqToCallback : true // allows us to pass back the entire request to the callback
 
-            },userlog)
+            },userLogin)
 
     );
 
-    //function userlog(){
-    function userlog(req, userid, password, done) {
+    //function userLogin(){
+    function userLogin(req, userid, password, done) {
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
         //console.log(req)
         var bodys = req.body;
         console.log(bodys)
-        DBSERVICE.getPlayerByUserid(bodys.username,function (err,rows) {
+        DBSERVICE.getPlayerByUserName(bodys.username,function (err,rows) {
             if (err){
                 console.log(err)
                 return done(err);
@@ -147,10 +129,10 @@ module.exports = function(passport) {
         }.bind({bodys:bodys}))
     }
 
-    function usersignup(bodys,done){
+    function userSignUp(bodys,done){
 
 
-        DBSERVICE.getPlayerByUserid(bodys.username,function (err,rows) {
+        DBSERVICE.getPlayerByUserName(bodys.username,function (err,rows) {
             if (err)
                 return done(err);
             if (rows.length) {

@@ -8,7 +8,6 @@ function loginGet(req, res){
 
 }
 
-
 module.exports={
     loginGet : loginGet
 }

@@ -96,9 +96,6 @@
             <tr>
                 <th>Id</th>
                 <th>Name</th>
-                <th>nickName</th>
-                <th>Age</th>
-                <th>Sex</th>
                 <th>Coin</th>
             </tr>
             </thead>
@@ -109,17 +106,9 @@
                     <%= user.playerid %>
                 </td>
                 <td>
-                    <%= user.playerid %>
+                    <%= user.username %>
                 </td>
-                <td>
-                    <%= user.nickname %>
-                </td>
-                <td>
-                    <%= user.age %>
-                </td>
-                <td>
-                    <%= user.sex %>
-                </td>
+
                 <td>
                     <%= user.coin %>
                 </td>
@@ -133,7 +122,7 @@
     <div class="body-box">
         <div class="panel panel-primary">
             <div class="panel-heading">
-                <h3 class="panel-title">购币充值</h3>
+                <h3 class="panel-title">购买ETH直接充值</h3>
             </div>
 
             <a  id="clickotcid" class="clickotc" >点击跳转购币充值界面</a>
@@ -145,7 +134,7 @@
     <div class="body-box">
         <div class="panel panel-primary">
             <div class="panel-heading">
-                <h3 class="panel-title">玩家区块链地址</h3>
+                <h3 class="panel-title">加密币充值地址和汇率</h3>
             </div>
 
             <table class="table table-bordered table-hover table-striped">
@@ -162,7 +151,7 @@
                     <div>
                         <td>{{key}}</td>
                         <td>{{item.address}}</td>
-                        <td>{{item.virtualRate}}</td>
+                        <td>{{item.fiatRate}}</td>
                         <td class="addPhoto" :id="i" v-on:click="toShow(item.address,i)" :isClick="true" ref="mybox">获取二维码</td>
                     </div>
 

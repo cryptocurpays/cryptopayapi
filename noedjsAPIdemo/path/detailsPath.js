@@ -9,51 +9,31 @@ const redisconfig = require('./../config/redisconfig')
 client = redis.createClient(redisconfig.port,redisconfig.host);
 const DBService =require('./../service/db_service');
 
-var apihost='https://api.cryptocurpays.com/api/v1/'
+const AppCfg = require('./../config/application')
 
-var appId=153
-var userId = 11872
-var appSecret = 'lRxHaZ0fdXaiiTJCgCp4H5HlN2Fom9OdPEEl5grtYf5PZs0lVGOF0ZyuXEaT7adRLqzsCegpw2YqPeEiv8EDbxTLGPQrkWPOHyOGHHMExscZ2oayEOXhNp1a9KADlyZhZRUeig08OYSEKWHHlmFXca1IELbI9MRnxTyS1wcMJLV3c8GOQn9W3PmgQQUBCr0QfnqYcWqI'
-var token = '9o3YxnWu0uVU59xeY3kPsNM2LL10mltRwNAM-UmM'
+var apihost=AppCfg.apiHost
+var appId=AppCfg.appId
+var appSecret = AppCfg.appSecret
 
-//var data = {
-//    appId:appId,
-//    userId:userId,
-//    appsecret:appSecret,
-//}
-
-function detailsGet(req,res){
-    var data ={}
-
-    tools.sendhttppost("",data,function(err,data){
-
-        this.res.render('profile.ejs', {user: user});
-    }.bind({res:this.res}))
-
-
-}
-
-
-function useraddress(req,res){
+function userAddress(req,res){
 
     //return res.send('{"eth":{"address":"0x9ec7dbc417df21fd046a70431d774329ceebcebd","virtualRate":505.2672},"bch":{"address":"muzWUmm4biEQi4sKN4H9ssdsqeagxXc8Nr","virtualRate":893.3159999999999}}')
-    getUserApiToken(req.user.playerid,function(tonken){
-        var url = apihost+appId+"/users/"+req.user.playerid+"/address?token="+tonken
-        //console.log(url)
+    getUserApiToken(req.user.playerid,function(err, token){
+        if(err) return res.send(err);
+        let url = apihost+appId+"/users/"+req.user.playerid+"/address?token="+token
+        console.log(url)
         tools.sendhttpget(url,function(err,data){
-            console.log(err)
-            console.log(data)
+            if(err) return res.send(err)
             data = JSON.parse(data)
-            res.send(data.data.addresses)
+            if(data.type!==0)
+                return res.send('API Error Code:'+data.type)
+            return res.send(data.data.addresses)
         })
     })
 }
 
 
-function getrates(req,res){
-    //return res.send('{"eth":505.2672,"bch":893.3159999999999}')
-
-
+function getRates(req,res){
     var fiatName = req.query.fiatName
     var url = apihost+"rates/" + fiatName
     //console.log(url)
@@ -67,10 +47,8 @@ function getrates(req,res){
 }
 
 function pendingDeposits(req,res){
-    //return res.send('{"eth":{"0x50753cdefd9d1cfb1ab004289b987ec01ef78c88136a0d98635693e911e835f4":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":19,"need":20},"0xc5d95ca4e1fe3de8c63e37c5a81857fa5919c7abf09ad70b14261929fbca0bfa":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20},"0xff9be4fb9b65e672b4e22d66ca8c3f1865da1dd5febb85611981249e13eebbbc":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20}}}')
 
-
-    getUserApiToken(req.user.playerid,function(tonken){
+    getUserApiToken(req.user.playerid,function(err,tonken){
         var url = apihost+appId+"/users/"+req.user.playerid+"/pendingdeposits?token="+tonken
         //console.log(url)
         tools.sendhttpget(url,function(err,data){
@@ -80,14 +58,12 @@ function pendingDeposits(req,res){
             res.send(data.data)
         })
     })
-
-
 }
 
 function withdraw(req,res){
     //return res.send('{"withdrawId":"20:11:36","withdrawLogId":1}')
 
-    getUserApiToken(req.user.playerid,function(tonken){
+    getUserApiToken(req.user.playerid,function(err,tonken){
 
         var d =new Date()
 
@@ -127,8 +103,6 @@ function withdraw(req,res){
                 //console.log(data)
 
                 // res.send("success")
-
-
                 DBService.addARecord("app_withdraw",postObj,function(err,d){
 
                     console.log(err)
@@ -147,13 +121,7 @@ function withdraw(req,res){
 
 
             }.bind({postObj}))
-
-
         })
-
-
-
-
     })
 
 }
@@ -180,15 +148,15 @@ function depositList(req,res){
 function getUserApiToken(playerid,done){
 
     var url = apihost+appId+"/token/"+playerid+"?appsecret="+appSecret
-    //console.log(url)
+    console.log(url)
     tools.sendhttpget(url,function(err,data){
-        console.log(err)
-        console.log(data)
+        
+        if(err) return done(err)
         data = JSON.parse(data)
-        return done(data.data.Token)
+        if(data.type!==0)
+            return done('API Error Code:'+data.type)
+        return done(null,data.data.Token)
     })
-
-    //return done("9o3YxnWu0uVU59xeY3kPsNM2LL10mltRwNAM-UmM")
 }
 
 
@@ -286,19 +254,14 @@ function postWithdraw(req,res){
 
 
     }.bind({body}))
-
-
-
-
-
 }
 
 
-function openotcurl(req,res){
+function openOtcUrl(req,res){
     //return res.send('{"eth":{"0x50753cdefd9d1cfb1ab004289b987ec01ef78c88136a0d98635693e911e835f4":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":19,"need":20},"0xc5d95ca4e1fe3de8c63e37c5a81857fa5919c7abf09ad70b14261929fbca0bfa":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20},"0xff9be4fb9b65e672b4e22d66ca8c3f1865da1dd5febb85611981249e13eebbbc":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20}}}')
 
 
-    getUserApiToken(req.user.playerid,function(tonken){
+    getUserApiToken(req.user.playerid,function(err,tonken){
         var url = apihost+appId+"/otcurl/"+req.user.playerid+"?token="+tonken+"&userName="+req.user.nickname
         //console.log(url)
         tools.sendhttpget(url,function(err,data){
@@ -313,7 +276,7 @@ function openotcurl(req,res){
 }
 
 
-module.exports={detailsGet,useraddress,getrates,pendingDeposits,withdraw,postNewDeposit,postWithdraw,withdrawList,depositList
-    ,openotcurl,
+module.exports={userAddress,getRates,pendingDeposits,withdraw,postNewDeposit,postWithdraw,withdrawList,depositList
+    ,openOtcUrl,
 }
 

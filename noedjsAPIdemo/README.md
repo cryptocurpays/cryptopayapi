@@ -1,22 +1,33 @@
-# Complete Guide to Coin and Cryptocurrecny Exchange Demo
+# Complete Guide to CryptoPay API Demo
 
-This is an onging project.
+CryptoPay is a platform which enables third party applications to receive/send crypto currencies to their customers.
 
-Current version database is ported to MySQL
+This repository demonstrates how to implement CryptoPay API. For more details, please refer to the API document.
 
-We will be using Passport to authenticate users locally, 
-
-## Instructions
+Visit http://demo.cryptocurpays.com:8080/ to try the demo.
 
 If you would like to download the code and try it for yourself:
 
-1. Clone the repo: `git clone git@github.com:JeremywangCN/coin-cryptocurrency-exchange.git`
-1. Install packages: `npm install`
-1. Edit the database configuration: `config/database.js`
-1. Edit the ethereum configuration: 'config/ethereum.js'
-1. Create the database schema: `node scripts/create_database.js`
-1. Create a BCH HDkey for demo: `node scripts/create_bchhdprivatekey.js`
-1. Launch: `node server.js`
-1. Visit in your browser at: `http://localhost:8080`
+
+## Installation
+
+1. Clone the repo: `git clone git@github.com:JeremywangCN/cryptopayapi.git`
+2. Install packages: `npm install`
+3. Install Mysql and Edit the database configuration: `config/database.js`
+4. Install Redis and Edit Redis configuration: 'config/redisconfig.js'
+5. Create the database schema: `cryptodemos.sql`
+6. Launch: `node web.js`
+7. Visit in your browser at: `http://localhost:8080`
+
+## Set up application
+
+1. Clone the repo: `git clone git@github.com:JeremywangCN/cryptopayapi.git`
+2. Install packages: `npm install`
+3. Install Mysql and Edit the database configuration: `config/database.js`
+4. Install Redis and Edit Redis configuration: 'config/redisconfig.js'
+5. Create the database schema: `cryptodemos.sql`
+6. Launch: `node web.js`
+7. Visit in your browser at: `http://localhost:8080`
+
 
 Licence: 1

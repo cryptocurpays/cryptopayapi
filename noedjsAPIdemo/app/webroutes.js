@@ -20,10 +20,8 @@ module.exports = {initRoutes: function(app, passport,worker) {
 	app.get('/', function(req, res) {
         //var array ={"userid":2};
         //tools.sendhttppost("http://localhost:8081/makeaddress",array)
-        res.render('index.ejs'); // load the index.ejs file
+        res.render('login.ejs'); // load the index.ejs file
         // res.render('mhlogin.html');
-
-
 	});
 
     app.get('/userdata', function(req, res) {
@@ -31,8 +29,6 @@ module.exports = {initRoutes: function(app, passport,worker) {
         //tools.sendhttppost("http://localhost:8081/makeaddress",array)
         //res.render('index.ejs'); // load the index.ejs file
         res.render('mhlogin.html',{user: req.user});
-
-
     });
 
     app.get('/login', loginpath.loginGet);
@@ -52,17 +48,29 @@ module.exports = {initRoutes: function(app, passport,worker) {
             } else {
                 req.session.cookie.expires = false;
             }
-            res.redirect('/');
+ //           res.redirect('/');
         }
     );
 
+    // process the signup form
+    app.post('/signup', passport.authenticate('local-signup', {
+            successRedirect : '/userdata', // redirect to the secure profile section
+            failureRedirect : '/login', // redirect back to the signup page if there is an error
+            failureFlash : true // allow flash messages
+        }),
+        function(req, res) {
+            console.log("hello");
 
-    app.get('/signup', function (req,res,next) {
+            if (req.body.remember) {
+                req.session.cookie.maxAge = 1000 * 60 * 3;
+            } else {
+                req.session.cookie.expires = false;
+            }
+           // res.redirect('/');
+        }
+    );
 
-        res.render('signup.ejs', { message: req.flash('signupMessage') });
-
-    });
-
+/*
     app.post('/signup', function(req, res, next) {
         passport.authenticate('local-signup',function(err, user, info){
             //注册失败
@@ -78,28 +86,27 @@ module.exports = {initRoutes: function(app, passport,worker) {
             } else {
                 req.session.cookie.expires = false;
             }
-            res.send(user)
-
-
+            //res.send(user)
+            res.redirect('/userdata')
         })(req, res, next);
     })
+*/
 
 
-
-    app.get('/details',isLoggedIn, details.detailsGet);//test
+  //  app.get('/details',isLoggedIn, details.detailsGet);//test
 
 
 
     //background web
 
 
-    app.get('/useraddress',details.useraddress)
-    app.get('/getrates',details.getrates)
+    app.get('/useraddress',details.userAddress)
+    app.get('/getrates',details.getRates)
     app.get('/pendingdeposits',details.pendingDeposits)
     app.get('/outwithdraw',details.withdraw)
     app.get('/withdrawlist',details.withdrawList)
     app.get('/depositlist',details.depositList)
-    app.get('/openotcurl',details.openotcurl)
+    app.get('/openotcurl',details.openOtcUrl)
 
     //restful 通知
     app.post('/deposit',details.postNewDeposit) //deposit

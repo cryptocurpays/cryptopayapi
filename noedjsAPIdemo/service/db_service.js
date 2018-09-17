@@ -7,7 +7,7 @@ var tools=require("./../app/tools")
 
 
 
-function getPlayerByUserid(username,done) {
+function getPlayerByUserName(username,done) {
     pool.getConnection(function (err,connection) {
         if (err) {
             connection.release();
@@ -417,7 +417,7 @@ function codeSQLescapeId(value){
 
 
 module.exports = {
-    getPlayerByUserid:getPlayerByUserid,
+    getPlayerByUserName:getPlayerByUserName,
     addUser:addUser,
     updateCoinByUsername:updateCoinByUsername,
     getAllTableConfig:getAllTableConfig,
