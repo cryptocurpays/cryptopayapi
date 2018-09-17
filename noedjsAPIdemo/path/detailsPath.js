@@ -47,7 +47,6 @@ function getRates(req,res){
 }
 
 function pendingDeposits(req,res){
-
     getUserApiToken(req.user.playerid,function(err,tonken){
         var url = apihost+appId+"/users/"+req.user.playerid+"/pendingdeposits?token="+tonken
         //console.log(url)
@@ -126,7 +125,6 @@ function withdraw(req,res){
 
 }
 
-
 function withdrawList(req,res){
     DBService.getWithdrawByPlayer(req.user.playerid,function(err,data){
         console.log(err)
@@ -158,8 +156,6 @@ function getUserApiToken(playerid,done){
         return done(null,data.data.Token)
     })
 }
-
-
 
 function postNewDeposit(req,res){
     var body = req.body
@@ -213,9 +209,6 @@ function postNewDeposit(req,res){
         }.bind({postObj}))
 
     }.bind({body}))
-
-
-
 }
 
 function postWithdraw(req,res){
@@ -251,16 +244,12 @@ function postWithdraw(req,res){
 
             return res.send("{\"message\":\"received!\"}")
         })
-
-
     }.bind({body}))
 }
 
 
 function openOtcUrl(req,res){
     //return res.send('{"eth":{"0x50753cdefd9d1cfb1ab004289b987ec01ef78c88136a0d98635693e911e835f4":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":19,"need":20},"0xc5d95ca4e1fe3de8c63e37c5a81857fa5919c7abf09ad70b14261929fbca0bfa":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20},"0xff9be4fb9b65e672b4e22d66ca8c3f1865da1dd5febb85611981249e13eebbbc":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20}}}')
-
-
     getUserApiToken(req.user.playerid,function(err,tonken){
         var url = apihost+appId+"/otcurl/"+req.user.playerid+"?token="+tonken+"&userName="+req.user.nickname
         //console.log(url)
@@ -271,11 +260,7 @@ function openOtcUrl(req,res){
             res.send(data.data)
         })
     })
-
-
 }
-
-
 module.exports={userAddress,getRates,pendingDeposits,withdraw,postNewDeposit,postWithdraw,withdrawList,depositList
     ,openOtcUrl,
 }
