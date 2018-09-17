@@ -44,7 +44,18 @@
     app.use(passport.initialize());
     app.use(passport.session()); // persistent login sessions
     app.use(flash()); // use connect-flash for flash messages stored in session
-
+    app.use(function(err, req, res, next) {
+        if (err) {
+            req.logout();
+            if (req.originalUrl == "/login") {
+                next(); // never redirect login page to itself
+            } else {
+                res.redirect("/login");
+            }
+        } else {
+            next();
+        }
+    });
 
     // routes ======================================================================
     //require('./app/routes.js').initRoutes(app, passport,cluster.worker); // load our routes and pass in our app and fully configured passport

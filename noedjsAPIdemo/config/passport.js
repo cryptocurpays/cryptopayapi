@@ -42,8 +42,10 @@ module.exports = function(passport) {
         DBSERVICE.getPlayerByUserName(username,function (err,rows) {
             //console.log(err)
             if(err)
-                return
-            done(err, rows[0]);
+                return done(err)
+            if(rows.length===0)
+                return done('No User Found')
+            done(null, rows[0]);
         })
         /*
         connection.query("SELECT * FROM users WHERE id = ? ",[id], function(err, rows){
