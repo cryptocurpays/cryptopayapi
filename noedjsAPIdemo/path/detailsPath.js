@@ -15,9 +15,11 @@ var apihost=AppCfg.apiHost
 var appId=AppCfg.appId
 var appSecret = AppCfg.appSecret
 
+
+// Get a player's deposit addresses. Need to retrieve the token and use the token to retrieve the addresses.
+
 function userAddress(req,res){
 
-    //return res.send('{"eth":{"address":"0x9ec7dbc417df21fd046a70431d774329ceebcebd","virtualRate":505.2672},"bch":{"address":"muzWUmm4biEQi4sKN4H9ssdsqeagxXc8Nr","virtualRate":893.3159999999999}}')
     getUserApiToken(req.user.playerid,function(err, token){
         if(err) return res.send(err);
         let url = apihost+appId+"/users/"+req.user.playerid+"/address?token="+token
@@ -36,7 +38,7 @@ function userAddress(req,res){
 function getRates(req,res){
     var fiatName = req.query.fiatName
     var url = apihost+"rates/" + fiatName
-    //console.log(url)
+    console.log(url)
     tools.sendhttpget(url, function (err, data) {
         console.log(err)
         console.log(data)
@@ -49,7 +51,7 @@ function getRates(req,res){
 function pendingDeposits(req,res){
     getUserApiToken(req.user.playerid,function(err,tonken){
         var url = apihost+appId+"/users/"+req.user.playerid+"/pendingdeposits?token="+tonken
-        //console.log(url)
+        console.log(url)
         tools.sendhttpget(url,function(err,data){
             console.log(err)
             console.log(data)
@@ -59,70 +61,61 @@ function pendingDeposits(req,res){
     })
 }
 
+//A player sends a withdraw request to the game server.
+// The game server deducts coins from the player's account and send a crypto withdraw request to the payment gateway.
+// We assume player specify the coin amount and crypto type.
 function withdraw(req,res){
-    //return res.send('{"withdrawId":"20:11:36","withdrawLogId":1}')
 
-    getUserApiToken(req.user.playerid,function(err,tonken){
+    var withdrawData = {
+        toaddress:req.query.toaddress,
+        cryptotype:req.query.cryptotype,
+        coinamount:req.query.amount,
+        playerid:req.user.playerid,
+        status: tools.WithdrawStatus.Created
+    }
 
-        var d =new Date()
+    var url = apihost+"rates/cny"
 
-        var data = {
-            toAddress:req.query.toaddress,
-            withdrawId:d.valueOf(),
-            appSecret:appSecret,
-            cryptoValue:req.query.amount,
-            appuserid:req.user.playerid,
-            signature:"123123"
+    tools.sendhttpget(url, function (err, data) {
+
+        if((err)||(data.type!==0)){
+            return res.send('Cannot handle the withdraw request because the rate service is out of service!')
         }
 
-        let postObj = {};
-        postObj.orderid = data.withdrawId
-        postObj.cryptotype = req.query.cryptoType
-        postObj.cryptovalue = data.cryptoValue
-        postObj.createtime = d.valueOf()
-        postObj.playerid = data.appuserid
+        data = JSON.parse(data)
 
+        withdrawData.rates = data.data[withdrawData.cryptotype]
+        withdrawData.cryptovalue = parseFloat(withdrawData.coinamount/withdrawData.rates);
 
-        var url = apihost+"rates/cny"
-        //console.log(url)
-        tools.sendhttpget(url, function (err, data) {
+        DBService.updateAddCoinByPlayerid(-withdrawData.coinAmt,req.user.playerid,function(err,data){
+            if(err) return res.send(err);
             console.log(err)
-            console.log(data)
-            data = JSON.parse(data)
-            // res.send(data.data)
 
+            DBService.addARecord("app_withdraw",withdrawData,function(err,d){
+                if(err) return res.send(err)
 
-            var rates = data.data[postObj.cryptotype]
+                let post ={};
+                var url = apihost+appId+"/tx/withdraw/"+req.query.cryptoType
+                post.orderId = d.insertId;
+                post.cryptoType=withdrawData.cryptotype;
+                post.toAddress=withdrawData.toaddress;
+                post.cryptoValue= withdrawData.cryptovalue;
 
-            var coin = postObj.cryptovalue*rates
+                tools.sendhttppost(url,this.data,function(err,resData){
 
-            DBService.updateAddCoinByPlayerid(-coin,req.user.playerid,function(err,data){
+                    if(err) return res.send(err)
+                    resData = JSON.parse(data)
+                    if(resData.type!==0)
+                        return res.send('API Error Code:'+resData.type)
 
-                console.log(err)
-                //console.log(data)
-
-                // res.send("success")
-                DBService.addARecord("app_withdraw",postObj,function(err,d){
-
-                    console.log(err)
-                    console.log(d)
-
-                    var url = apihost+appId+"/tx/withdraw/"+req.query.cryptoType
-                    console.log(url)
-                    tools.sendhttppost(url,this.data,function(err,data){
-                        console.log(err)
-                        console.log(data)
-                        data = JSON.parse(data)
-                        res.send(data)
+                    DBService.updateSubmittedWithdraw(resData.data.withdrawId,resData.data.orderId,function (err,done) {
+                        if(err) return res.send(err)
+                        return res.send(resData.data)
                     })
-                }.bind({postObj,data}))
-
-
-
-            }.bind({postObj}))
+                })
+            })
         })
     })
-
 }
 
 function withdrawList(req,res){
@@ -153,7 +146,7 @@ function getUserApiToken(playerid,done){
         data = JSON.parse(data)
         if(data.type!==0)
             return done('API Error Code:'+data.type)
-        return done(null,data.data.Token)
+        return done(null,data.data.token)
     })
 }
 
@@ -211,6 +204,9 @@ function postNewDeposit(req,res){
     }.bind({body}))
 }
 
+//This function was called by payment gateway, noticing the game server that a withdraw request has been fulfilled.
+
+
 function postWithdraw(req,res){
     var body = req.body
     console.log(body)
@@ -262,6 +258,6 @@ function openOtcUrl(req,res){
     })
 }
 module.exports={userAddress,getRates,pendingDeposits,withdraw,postNewDeposit,postWithdraw,withdrawList,depositList
-    ,openOtcUrl,
+    ,openOtcUrl
 }
 

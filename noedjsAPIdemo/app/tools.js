@@ -196,7 +196,11 @@ function isNotNumberUnsigned(number){
     return false
 }
 
-
+const WithdrawStatus ={
+    Created: 0,//收到请求订单生成
+    Submitted: 20,//提交到本地Node，成功生成交易哈希值
+    Notified:80,//广播订单 通知代理商游戏服务器
+};
 
 
 module.exports={
@@ -220,6 +224,7 @@ module.exports={
     isNullStringLength,
     isNullString,
     isNotNumber,
-    isNotNumberUnsigned
+    isNotNumberUnsigned,
+    WithdrawStatus
 }
 

@@ -206,9 +206,44 @@ function updateAddCoinByPlayerid(coin,playerid,done) {
             connection.release();
             return done("Error in connection database");
         }
+        if(coin<0){
+            let selectQ = 'SELECT * FROM '+DBCONFIG.database + "."+DBCONFIG.players_table+" WHERE playerid = "+playerid;
+            connection.query(selectQ,function (err,data) {
+                if(err) return done(err)
+                else if(data.length!==1) return done('Cannot find the player to update Coin')
+                else if((data[0].coin)<coin) return done('This player does not have enough coin to update!')
+                else {
+                    var sql = "UPDATE " + DBCONFIG.database + "."+DBCONFIG.players_table+" SET coin = coin+"+coin+" WHERE playerid = "+playerid +" "
+                    connection.query(sql, function (err, rows) {
+                        if (err) {
+                            return done(err);
+                        }
+                        return done(null, rows);
+                    });
+                    connection.release();
+                }
+            })
+        }else{
+            var sql = "UPDATE " + DBCONFIG.database + "."+DBCONFIG.players_table+" SET coin = coin+"+coin+" WHERE playerid = "+playerid +" "
+            connection.query(sql, function (err, rows) {
+                if (err) {
+                    return done(err);
+                }
+                return done(null, rows);
+            });
+            connection.release();
+        }
+    })
+}
 
-        var sql = "UPDATE " + DBCONFIG.database + "."+DBCONFIG.players_table+" SET coin = coin+"+coin+" WHERE playerid = "+playerid +" "
-        console.log(sql)
+function updateSubmittedWithdraw(withdrawId, orderId,done) {
+    pool.getConnection(function (err,connection) {
+        if (err) {
+            connection.release();
+            return done("Error in connection database");
+        }
+
+        var sql = "UPDATE " + DBCONFIG.database + "."+DBCONFIG.app_withdraw_table+" SET withdrawid = "+withdrawId+" AND status = "+tools.WithdrawStatus.Submitted+" WHERE id = "+orderId +" "
         connection.query(sql, function (err, rows) {
             if (err) {
                 return done(err);
@@ -216,6 +251,7 @@ function updateAddCoinByPlayerid(coin,playerid,done) {
             return done(null, rows);
         });
         connection.release();
+
     })
 }
 
@@ -435,4 +471,5 @@ module.exports = {
     updateWithdrawByOrderId:updateWithdrawByOrderId,
     getWithdrawByPlayer:getWithdrawByPlayer,
     getDepositByPlayerid:getDepositByPlayerid,
+    updateSubmittedWithdraw:updateSubmittedWithdraw
 };

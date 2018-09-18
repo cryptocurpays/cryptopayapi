@@ -27,7 +27,7 @@ module.exports = {initRoutes: function(app, passport,worker) {
         // res.render('mhlogin.html');
 	});
 
-    app.get('/userdata', function(req, res) {
+    app.get('/userdata',isLoggedIn, function(req, res) {
         //var array ={"userid":2};
         //tools.sendhttppost("http://localhost:8081/makeaddress",array)
         //res.render('index.ejs'); // load the index.ejs file
