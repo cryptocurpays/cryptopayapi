@@ -67,7 +67,7 @@ function getWithdrawByTxid(orderid,done) {
             connection.release();
             return done("Error in connection database");
         }
-        connection.query("SELECT * FROM "+DBCONFIG.database+ "."+ DBCONFIG.app_withdraw_table +" where orderid='"+orderid+"'", function(err, rows){
+        connection.query("SELECT * FROM "+DBCONFIG.database+ "."+ DBCONFIG.app_withdraw_table +" where id='"+orderid+"'", function(err, rows){
 
 
             if (err){
@@ -150,7 +150,7 @@ function updateWithdrawByOrderId(orderid,data,done) {
             return done("Error in connection database");
         }
 
-        var sql = "UPDATE " + DBCONFIG.database + "."+DBCONFIG.app_withdraw_table+" SET txid = "+codeSQLescape(data.txid) +" , blocknumber="+codeSQLescape(data.blocknumber)+ " , statues="+codeSQLescape(data.statues)+" WHERE orderid = '"+orderid +"'"
+        var sql = "UPDATE " + DBCONFIG.database + "."+DBCONFIG.app_withdraw_table+" SET txid = "+codeSQLescape(data.txid) + " , status="+codeSQLescape(data.statues)+" WHERE id = '"+orderid +"'"
         console.log(sql)
         connection.query(sql, function (err, rows) {
             if (err) {

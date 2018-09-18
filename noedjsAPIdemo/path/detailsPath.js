@@ -212,31 +212,31 @@ function postWithdraw(req,res){
         return res.send("{\"message\":\"body fail!\"}")
     }
 
-    if(tools.isNullString(body.orderid)){
+    if(tools.isNullString(body.orderId)){
         return res.send("{\"message\":\"txId fail!\"}")
     }
 
-    DBService.getWithdrawByTxid(body.orderid,function(err,data){
+    DBService.getWithdrawByTxid(body.orderId,function(err,data){
         console.log(err)
 
         if(data.length <=0){
-            return
+            return res.send("{\"message\":\"Order Id Error!\"}")
         }
 
-        if(data[0].statues==10){
+        if(data[0].statues==tools.WithdrawStatus.Notified){
             return res.send("{\"message\":\"received!\"}")
         }
 
         var tx = {}
-        tx.txid=body.txHash
-        tx.blocknumber =body.blockNumber
-        tx.statues =10
+        tx.txid=body.txId;
+        tx.statues =tools.WithdrawStatus.Notified;
+        tx.cryptovalue = body.cryptoValue
 
-        DBService.updateWithdrawByOrderId(data[0].orderid,tx,function(err,data){
-            console.log(err)
-            console.log(data)
-
-            return res.send("{\"message\":\"received!\"}")
+        DBService.updateWithdrawByOrderId(data[0].id,tx,function(err,data){
+            if(err)
+                return res.send("{\"message\":\"Update DB Error!\"}")
+            else
+                return res.send("{\"message\":\"received!\"}")
         })
     }.bind({body}))
 }
