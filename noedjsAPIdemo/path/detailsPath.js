@@ -68,7 +68,7 @@ function withdraw(req,res){
 
     var withdrawData = {
         toaddress:req.query.toaddress,
-        cryptotype:req.query.cryptotype,
+        cryptotype:req.query.cryptoType,
         coinamount:req.query.amount,
         playerid:req.user.playerid,
         status: tools.WithdrawStatus.Created
@@ -78,16 +78,15 @@ function withdraw(req,res){
 
     tools.sendhttpget(url, function (err, data) {
 
-        if((err)||(data.type!==0)){
+        let dataObj = JSON.parse(data)
+        if((err)||(dataObj.type!==0)){
             return res.send('Cannot handle the withdraw request because the rate service is out of service!')
         }
 
-        data = JSON.parse(data)
-
-        withdrawData.rates = data.data[withdrawData.cryptotype]
+        withdrawData.rates = dataObj.data[withdrawData.cryptotype]
         withdrawData.cryptovalue = parseFloat(withdrawData.coinamount/withdrawData.rates);
 
-        DBService.updateAddCoinByPlayerid(-withdrawData.coinAmt,req.user.playerid,function(err,data){
+        DBService.updateAddCoinByPlayerid(-withdrawData.coinamount,req.user.playerid,function(err,data){
             if(err) return res.send(err);
             console.log(err)
 
@@ -101,16 +100,16 @@ function withdraw(req,res){
                 post.toAddress=withdrawData.toaddress;
                 post.cryptoValue= withdrawData.cryptovalue;
 
-                tools.sendhttppost(url,this.data,function(err,resData){
+                tools.sendhttppost(url,post,function(err,resData){
 
                     if(err) return res.send(err)
-                    resData = JSON.parse(data)
-                    if(resData.type!==0)
-                        return res.send('API Error Code:'+resData.type)
+                    let data = JSON.parse(resData)
+                    if(data.type!==0)
+                        return res.send('API Error Code:'+data.type)
 
-                    DBService.updateSubmittedWithdraw(resData.data.withdrawId,resData.data.orderId,function (err,done) {
+                    DBService.updateSubmittedWithdraw(data.data.withdrawId,data.data.orderId,function (err,done) {
                         if(err) return res.send(err)
-                        return res.send(resData.data)
+                        return res.send(data.data)
                     })
                 })
             })
@@ -197,7 +196,6 @@ function postNewDeposit(req,res){
 
                 return res.send("{\"message\":\"received!\"}")
             }.bind({postObj}))
-
 
         }.bind({postObj}))
 
