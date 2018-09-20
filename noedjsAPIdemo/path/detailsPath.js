@@ -243,10 +243,11 @@ function postWithdraw(req,res){
 
 
 function openOtcUrl(req,res){
+    // url=encodeURIComponent(url)
     //return res.send('{"eth":{"0x50753cdefd9d1cfb1ab004289b987ec01ef78c88136a0d98635693e911e835f4":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":19,"need":20},"0xc5d95ca4e1fe3de8c63e37c5a81857fa5919c7abf09ad70b14261929fbca0bfa":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20},"0xff9be4fb9b65e672b4e22d66ca8c3f1865da1dd5febb85611981249e13eebbbc":{"from":"0x34b8fb244cee0630186ce59f5577c7cc3d8ce3f5","value":1,"confirmations":17,"need":20}}}')
     getUserApiToken(req.user.playerid,function(err,tonken){
-        var url = apihost+appId+"/otcurl/"+req.user.playerid+"?token="+tonken+"&userName="+req.user.nickname
-        //console.log(url)
+        var url = apihost+appId+"/otcurl/"+req.user.playerid+"?token="+tonken+"&userName="+encodeURIComponent(req.user.nickname)
+        console.log(url)
         tools.sendhttpget(url,function(err,data){
             console.log(err)
             console.log(data)
