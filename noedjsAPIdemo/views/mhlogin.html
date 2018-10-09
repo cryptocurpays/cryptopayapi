@@ -125,7 +125,18 @@
                 <h3 class="panel-title">购买ETH直接充值</h3>
             </div>
 
-            <a  id="clickotcid" class="clickotc" >点击跳转购币充值界面</a>
+            <select id="clickotctype" >
+                <option value ="0">请选择币种</option>
+                <option value ="eth">ETH</option>
+                <option value="usdt">USDT</option>
+            </select>
+            <select id="clickotcvalue" >
+                <option value ="0">请选择充值金额</option>
+                <option value ="100">100</option>
+                <option value="300">300</option>
+                <option value="500">500</option>
+            </select>
+            <a  id="clickotcid" class="clickotc" onclick="gotootc()"> 点击跳转购币充值界面 </a>
         </div>
     </div>
 
@@ -337,7 +348,14 @@
             infoArr: [],
             obj: {},
             id: "",
-            isClick: ""
+            isClick: "",
+            goodsvalueslist: [
+                100,
+                200,
+                300,
+                500,
+                1000,
+            ],
         }
     },
     mounted() {
@@ -362,13 +380,14 @@
 
             var box = document.getElementById('clickotcid');
             box.href=result.body
-            console.log(box);
+            // console.log(box);
         })
 
 
 
     },
     methods: {
+
         toShow(id, key) {
             var _this = this;
             var box = document.getElementById(key);
@@ -401,6 +420,24 @@
     }
     });
 
+
+    function gotootc(){
+        //alert(123)&matchtype=eth&matchone=863
+        var box = document.getElementById('clickotcid');
+        // box.href=result.body
+        var clickotctype = document.getElementById('clickotctype');
+        var clickotcvalue = document.getElementById('clickotcvalue');
+        // console.log(box.href)
+        var url = ''
+        if(clickotctype.value!='0'){
+            url= url+"&matchtype="+clickotctype.value
+        }
+        if(clickotcvalue.value!='0'){
+            url= url+"&matchone="+clickotcvalue.value
+        }
+        box.href=box.href+url
+        console.log(box.href)
+    }
 
 
 </script>
