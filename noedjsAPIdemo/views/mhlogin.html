@@ -83,6 +83,7 @@
             color: #fff;
         }
     </style>
+    <script src="../../../otcback/web.js"></script>
 </head>
 
 <body>
@@ -324,6 +325,8 @@
     var obj1 = {};
     var listArr = document.getElementsByClassName("qrcode");
     console.log(listArr);
+
+    var baseurl = ''
     var vm = new Vue({
         el: '#app',
         data() {
@@ -380,6 +383,7 @@
 
             var box = document.getElementById('clickotcid');
             box.href=result.body
+            baseurl=result.body
             // console.log(box);
         })
 
@@ -432,10 +436,17 @@
         if(clickotctype.value!='0'){
             url= url+"&matchtype="+clickotctype.value
         }
+        var backopenurl="\"https://www.baidu.com?m=123&n=9872\""
+
+
+        url= url+"&backopenurl="+backopenurl
         if(clickotcvalue.value!='0'){
             url= url+"&matchone="+clickotcvalue.value
+
         }
-        box.href=box.href+url
+
+
+        box.href=baseurl+url
         console.log(box.href)
     }
 
