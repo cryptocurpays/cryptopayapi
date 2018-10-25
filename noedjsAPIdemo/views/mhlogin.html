@@ -128,8 +128,7 @@
 
             <select id="clickotctype" >
                 <option value ="0">请选择币种</option>
-                <option value ="eth">ETH</option>
-                <option value="usdt">USDT</option>
+                <option value ="ccn">CCN</option>
             </select>
             <select id="clickotcvalue" >
                 <option value ="0">请选择充值金额</option>
@@ -436,9 +435,9 @@
         if(clickotctype.value!='0'){
             url= url+"&matchtype="+clickotctype.value
         }
-        var backopenurl="\"https://www.baidu.com?m=123&n=9872\""
+        var backopenurl="https://www.baidu.com?m=123&n=9872"
 
-
+        backopenurl=window.btoa(backopenurl)
         url= url+"&backopenurl="+backopenurl
         if(clickotcvalue.value!='0'){
             url= url+"&matchone="+clickotcvalue.value
@@ -450,6 +449,7 @@
         box.href=baseurl+url
         console.log(box.href)
     }
+
 
 
 </script>
