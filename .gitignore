@@ -226,3 +226,6 @@ node_modules*
 .node*
 sslkey/
 target
+vendor/
+*.iml
+*.lock
