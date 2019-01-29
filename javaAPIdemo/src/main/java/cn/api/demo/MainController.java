@@ -64,6 +64,9 @@ public class MainController {
             System.out.println("gotAddress="+gotAddress);//根据加密规则生成的计算参数,如果这两个数值相等的话,证明验证通过
 
             if(expectedAddress.equals(gotAddress)){
+                // 签名验证成功后，需要验证订单相关信息，并验证 支付金额
+                ///** 根据cryptoValue*fiatRate计算出实际法币价值，和商户订单中的支付金额的整数位比对，不要比对小数位。为避免充值金额重复，密付会对小数位做加减处理 */
+    
                 return "{\"message\":\"received!\"}";//System.out.println("success");
             }else{
                 return "{\"message\":\"error!\"}";
