@@ -38,6 +38,9 @@ $signedMessage = $serializer->parse($sig);
 $signer = new MessageSigner();
 if ($signer->verify($signedMessage, $app_address)) {
     echo "Signature verified!\n";// 验证加密签名成功
+    /** 加密验证成功后，需要对订单信息做验证，并验证订单金额 */
+    /** 根据cryptoValue*fiatRate计算出实际法币价值，和商户订单中的支付金额的整数位比对，不要比对小数位。为避免充值金额重复，密付会对小数位做加减处理 */
+    
 } else {
     echo "Failed to verify signature!\n";
 }
